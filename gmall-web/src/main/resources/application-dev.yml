@@ -1,0 +1,24 @@
+server:
+  port: 8300
+
+spring:
+  thymeleaf:
+    mode: LEGACY-HTML5
+    encoding: UTF-8
+    cache: false # 开发配置为false，避免修改模块还要重启服务器
+    prefix: classpath:/templates/
+  cloud:
+    sentinel:
+      transport:
+        dashboard: http://192.168.6.100:8858
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+feign:
+  sentinel:
+    enabled: true
+  client:
+    config:
+      default:
+        read-timeout: 3000
+        connect-timeout: 1000

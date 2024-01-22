@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.atguigu.gmall.product.mapper.SpuSaleAttrMapper">
+    
+    <resultMap id="SpuSaleAttrMap" type="com.atguigu.gmall.model.product.SpuSaleAttr" autoMapping="true">
+            <id column="id" property="id"/>
+            <id property="baseSaleAttrId" column="base_sale_attr_id"/>
+        <collection property="spuSaleAttrValueList" ofType="com.atguigu.gmall.model.product.SpuSaleAttrValue" autoMapping="true">
+            <id column="value_id" property="id" />
+            <id column="value_sale_attr_name" property="saleAttrName"/>
+        </collection>
+    </resultMap>
+    
+    <select id="selectBySpuId" resultMap="SpuSaleAttrMap">
+        select ssa.id,
+               ssa.base_sale_attr_id,
+               ssa.sale_attr_name,
+               ssa.spu_id,
+               ssav.id value_id,
+               ssav.sale_attr_value_name,
+               ssav.sale_attr_name value_sale_attr_name
+        from spu_sale_attr ssa inner join spu_sale_attr_value ssav
+             on ssa.base_sale_attr_id = ssav.base_sale_attr_id
+                and ssa.spu_id = ssav.spu_id
+        where ssa.spu_id = #{spuId}
+            and ssav.is_deleted = 0
+            and ssa.is_deleted = 0
+    </select>
+
+    <select id="getSpuSaleAttrListCheckBySku" resultMap="SpuSaleAttrMap">
+        SELECT
+            ssa.id,
+            ssa.base_sale_attr_id,
+            ssa.sale_attr_name,
+            ssa.spu_id,
+            ssav.id value_id,
+            ssav.sale_attr_value_name,
+            ssav.sale_attr_name value_sale_attr_name,
+            IF(sksav.sku_id is NULL, 0, 1) is_checked
+        FROM
+            spu_sale_attr ssa
+                INNER JOIN spu_sale_attr_value ssav ON ssa.base_sale_attr_id = ssav.base_sale_attr_id
+                AND ssav.spu_id = ssa.spu_id
+                LEFT JOIN sku_sale_attr_value sksav ON ssav.id = sksav.sale_attr_value_id
+                AND sksav.sku_id = #{skuId}
+        WHERE ssav.spu_id = #{spuId}
+            AND ssav.is_deleted = 0
+            AND ssa.is_deleted = 0
+        ORDER BY ssav.base_sale_attr_id, ssav.id
+    </select>
+    
+</mapper>

@@ -1,0 +1,89 @@
+server:
+  port: 80
+spring:
+  application:
+    name: server-gateway
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 192.168.6.100:8848
+    gateway:
+      discovery:      #是否与服务发现组件进行结合，通过 serviceId(必须设置成大写) 转发到具体的服务实例。默认为false，设为true便开启通过服务中心的自动根据 serviceId 创建路由的功能。
+        locator:      #路由访问方式：http://Gateway_HOST:Gateway_PORT/大写的serviceId/**，其中微服务应用名默认大写访问。
+          enabled: true
+      routes:
+        - id: service-product
+          uri: lb://service-product  # lb 代表负载均衡策略——轮询
+          predicates:
+            - Path=/*/product/** # 路径匹配
+        - id: service-item
+          uri: lb://service-item  # lb 代表负载均衡策略——轮询
+          predicates:
+            - Path=/*/item/** # 路径匹配
+        - id: web-item
+          uri: lb://web-all  # lb 代表负载均衡策略——轮询
+          predicates:
+            - Host=item.gmall.com
+        - id: web-index
+          uri: lb://web-all  # lb 代表负载均衡策略——轮询
+          predicates:
+            - Host=www.gmall.com
+        - id: web-list
+          uri: lb://web-all
+          predicates:
+            - Host=list.gmall.com
+        - id: service-user
+          uri: lb://service-user
+          predicates:
+            - Path=/*/user/**
+        - id: web-passport
+          uri: lb://web-all
+          predicates:
+            - Host=passport.gmall.com
+        - id: web-cart
+          uri: lb://web-all
+          predicates:
+            - Host=cart.gmall.com
+        - id: service-cart
+          uri: lb://service-cart
+          predicates:
+            - Path=/*/cart/**
+        - id: web-order
+          uri: lb://web-all
+          predicates:
+            - Host=order.gmall.com
+        - id: service-order
+          uri: lb://service-order
+          predicates:
+            - Path=/*/order/**
+        - id: web-payment
+          uri: lb://web-all
+          predicates:
+            - Host=payment.gmall.com
+        - id: service-payment
+          uri: lb://service-payment
+          predicates:
+            - Path=/*/payment/** # 路径匹配
+        - id: web-activity
+          uri: lb://web-all
+          predicates:
+            - Host=activity.gmall.com
+        - id: service-activity
+          uri: lb://service-activity
+          predicates:
+            - Path:/*/activity/** # 路径匹配
+  redis:
+    host: 192.168.6.100
+    port: 6379
+    database: 0
+    timeout: 1800000
+    password:
+    lettuce:
+      pool:
+        max-active: 20 # 最大连接数
+        max-wait: -1 # 最大阻塞等待时间（负数表示没限制）
+        max-idle: 5 # 最大空闲
+        min-idle: 0 # 最小空闲
+
+authUrls:
+  url: trade.html,myOrder.html #addCart.html我们这里未登录也能用购物车 #,list.html 测试用 # 用户访问该控制器的时候，会被拦截跳转到登录！
